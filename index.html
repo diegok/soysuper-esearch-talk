@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Elasticsearch at Soysuper</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/solarized.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+		<script>
+			if( window.location.search.match( /print-pdf/gi ) ) {
+				var link = document.createElement( 'link' );
+				link.rel = 'stylesheet';
+				link.type = 'text/css';
+				link.href = 'css/print/pdf.css';
+				document.getElementsByTagName( 'head' )[0].appendChild( link );
+			}
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+          <h1>Elasticsearch</h1>
+          <h1>at</h1>
+          <h1>soysuper.com</h1>
+          <br><br>
+          <h4>Diego Kuperman | @freekey</h4>
+				</section>
+
+				<section>
+					<h1>What is Soysuper ?</h1>
+				</section>
+
+				<section>
+          <h1>[Supermarket]</h1>
+          <img src="img/supers.png">
+				</section>
+
+				<section>
+          <h1>Pro tools</h1>
+          <br>
+          <h3>Soysuper Visibility</h3>
+          <h3>Soysuper Insights</h3>
+				</section>
+
+				<section>
+					<h1>Our data</h1>
+				</section>
+
+				<section>
+          <h2>7</h2>
+          <h4>Supermarkets</h4>
+          <h2>4476</h2>
+          <h4>Zipcodes with delivery</h4>
+          <h2>1292</h2>
+          <h4>Clusters</h4>
+				</section>
+
+				<section>
+          <h2>250244<h2>
+          <h4>Products from origin</h4>
+          <h2>181050</h2>
+          <h4>Clustered products</h4>
+          <h2>112173 </h2>
+          <h4>Available</h4>
+				</section>
+
+				<section>
+          <h2>8761707</h2>
+          <h4>Active prices</h4>
+          <h2>194000</h2>
+          <h4>Daily price updates (avg)</h4>
+				</section>
+
+				<section>
+          <h2>Using elasticsearch since 0.13.1</h2>
+				</section>
+
+				<section>
+          <h1>Elastic::Model</h1>
+          <h4>Thanks Clint ;-)</h4>
+				</section>
+
+				<section>
+					<h1>Products search</h1>
+          <img src="img/search.png">
+				</section>
+
+				<section>
+					<h1>...and navigation</h1>
+          <img src="img/category_menu_1.png">
+				</section>
+
+				<section>
+					<h2>Most users has zipcode and supermarket<h2>
+					<h2>(warehouse)<h2>
+				</section>
+
+				<section>
+					<h2>Each product is available in one or more warehouse...</h2>
+				</section>
+
+				<section>
+					<h2>Each warehouse may have different price and/or deal</h2>
+				</section>
+
+				<section>
+					<h1>One product</h1>
+					<h1>One ES doc</h1>
+				</section>
+
+        <section>
+          <h2>Basic data</h2>
+         <pre><code data-trim contenteditable class="javascript">
+name: "Cerveza",
+brand: "Estrella Damm",
+variant: "Pack 12x25 cl",
+v: { measure: "cl", quantifier: "25", container: "botellin", multiplier: "12" },
+keywords: [ "bebida", "cerveza", "nacional", "rubia", "extra" ],
+category_path: [ "bebidas/cerveza/nacional" ],
+brands: [ ... ],
+...
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Price object</h2>
+          <pre><code data-trim contenteditable class="javascript">
+price: {
+  condis: {
+    511e1b30a2c8bc21740006aa: [ 5.39 ],
+  },
+  carrefour: {
+    4ff30e32c27e95590200001d: [ 5.56, 'Deal' ],
+    4ff30e2fc27e95590200000c: [ 5.35 ],
+    ...
+  },
+  mercadona: {
+    53d838fa9717d5d27d000000: [ 5.39 ],
+    53a2c4f78e6fd283ac000000: [ 4.3 ],
+    ...
+  },
+  ...
+  _mean: 5.34
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>Pros</h1>
+          <ul>
+            <li>No term weight deviation (IDF)</li>
+            <li>No need for grouping (worked on 0.13.x)</li>
+            <li>Easy to fetch partial</li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>Cons</h1>
+          <pre><code data-trim contenteditable class="javascript">
+price: {
+  type: "object",
+  enabled: false
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>Cons</h1>
+          <ul>
+            <li>Can't filter</li>
+            <li>Can't sort</li>
+          </ul>
+        </section>
+
+        <section>
+          <h1>:-(</h1>
+        </section>
+
+        <section>
+          <h2>Filter</h2>
+          <pre><code data-trim contenteditable class="javascript">
+warehouse: [ 
+  "511e1b30a2c8bc21740006aa",
+  "4ff30e6a5832e48b02000000",
+  "5440df745488b4a35500003c",
+  ...
+],
+
+supermarket: [ "condis", "mercadona", "corteingles", "carrefour", "eroski" ],
+
+deal: [ "carrefour", "511e1b30a2c8bc21740006aa", ... ],
+          </code></pre>
+        </section>
+
+        <section>
+          <h2>Sort</h2>
+          <pre><code data-trim contenteditable class="javascript">
+mean_price: {
+  condis: 5.39,
+  mercadona: 5.34,
+  corteingles: 5.25,
+  carrefour: 5.52,
+  mean: 5.29,
+  eroski: 4.95
+}
+          </code></pre>
+        </section>
+
+        <section>
+          <h1>:-)</h1>
+        </section>
+
+        <section>
+          <h1>Query string query</h1>
+          <pre><code data-trim contenteditable class="javascript">
+{
+...
+  "query" : {
+    "query_string" : {
+      "fields" : [
+        "name^40", "name.stem^35",
+        "brands^10", "brands.stem^2",
+        "variant^5", "variant.stem",
+        "keywords", "tags",
+        "category_name^4",
+      ],
+      "query" : "cerveza",
+      "default_operator" : "AND"
+    }
+...
+   "_source" : {
+      "include" : [
+         "price.mercadona.51577e06e9725936090417ea",
+         ...
+      ]
+   },
+...
+}
+          </code></pre>
+        </section>
+
+				<section>
+          <img src="img/visibility_logo.png" class="plain">
+				</section>
+
+				<section>
+          <h2>Segmented ads</h2>
+          <img src="img/publi.png">
+				</section>
+
+				<section>
+					<h2>Real-time event indexing</h2>
+				</section>
+
+				<section>
+          <h2>Real time conversion funnel</h2>
+          <img src="img/publi_funel.png">
+				</section>
+
+				<section>
+          <h2>Real time segmented stats</h2>
+          <img src="img/publi_stats.png">
+				</section>
+
+				<section>
+					<h2>It was so easy!</h2>
+				</section>
+
+				<section>
+          <img src="img/log_all.jpg">
+				</section>
+
+				<section>
+          <img src="img/insights_logo.png" class="plain">
+				</section>
+
+				<section>
+					<h2>Real-time indexing (again)</h2>
+          <br>
+          <h3>MongoDB capped collection</h3>
+          <h3>Sync Daemon: mongo to elastic</h3>
+          <h3>(Inflate and add to index in bulk)</h3>
+				</section>
+
+        <section>
+          <h2>Elasticsearch index aliases</h2>
+          <h3>1 index per log type and month</h3>
+          <h3>Alias = Many indexes</h3>
+				</section>
+
+				<section>
+          <h2>Brand market share</h2>
+          <img src="img/brand_share.png">
+				</section>
+
+				<section>
+          <h2>Share evolution</h2>
+          <img src="img/share_evolution.png">
+				</section>
+
+				<section>
+          <h2>Segmented by anything</h2>
+          <img src="img/share_by_super.png">
+				</section>
+
+				<section>
+					<h2>Real-time analysis</h2>
+          <br>
+          <h3>Market share</h3>
+          <h3>Price elasticity</h3>
+          <h3>Deal/campaign performance</h3>
+          <h3>Buyers profile</h3>
+          <h3>Search keywords</h3>
+          <h3>Display/selling rate</h3>
+          <h3>System stats and failure detection</h3>
+          <h3>...</h3>
+				</section>
+
+        <section>
+          <h1>...</h1>
+				</section>
+
+				<section data-background="red">
+          <h1>Thanks!</h1>
+				</section>
+
+        <section>
+          <h1>Questions?</h1>
+				</section>
+
+				<section>
+          <img src="img/soysuper_logo.png" class="plain">
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: false,
+				progress: false,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'fade', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
